@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
+import { db } from './firebase'; // Importar la configuración de Firebase
 
 const App = () => {
   const [activeSection, setActiveSection] = useState('institutions');

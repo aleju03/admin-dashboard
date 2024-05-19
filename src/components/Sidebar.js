@@ -1,3 +1,4 @@
+// Sidebar.js
 import React from 'react';
 
 const Sidebar = ({ onSectionClick }) => {
@@ -40,6 +41,15 @@ const Sidebar = ({ onSectionClick }) => {
               onClick={() => onSectionClick('teachers')}
             >
               Profesores
+            </button>
+          </li>
+          <li className="mb-4">
+            <button
+              id="studentGuardians-link"
+              className="w-full text-left block py-2 px-4 hover:bg-blue-800 rounded"
+              onClick={() => onSectionClick('studentGuardians')}
+            >
+              Encargados de Estudiantes
             </button>
           </li>
         </ul>
