@@ -27,7 +27,7 @@ const MainContent = ({ activeSection }) => {
     try {
       await db.collection('teachers').add({
         name: teacherName,
-        institution: teacherInstitution,
+        institutionId: teacherInstitution,
       });
       alert('Profesor registrado exitosamente');
       setTeacherName('');
@@ -40,7 +40,7 @@ const MainContent = ({ activeSection }) => {
   const handleAddStudentGuardian = async () => {
     try {
       await db.collection('studentGuardians').add({
-        studentName: studentName,
+        studentId: studentName,
         guardianName: studentGuardian,
       });
       alert('Encargado de estudiante registrado exitosamente');
@@ -87,11 +87,9 @@ const MainContent = ({ activeSection }) => {
               Registrar Institución
             </button>
           </form>
-          {/* Aquí va el código de la tabla de instituciones */}
         </div>
       )}
 
-      {/* Sección de Profesores */}
       {activeSection === 'teachers' && (
         <div id="teachers">
           <div className="flex justify-between items-center mb-6">
@@ -115,7 +113,7 @@ const MainContent = ({ activeSection }) => {
               type="text"
               value={teacherInstitution}
               onChange={(e) => setTeacherInstitution(e.target.value)}
-              placeholder="Institución"
+              placeholder="ID de la Institución"
               className="border p-2 mb-2 w-full"
             />
             <button
@@ -124,13 +122,11 @@ const MainContent = ({ activeSection }) => {
               className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded"
             >
               Registrar Profesor
-            </button>
+            </button> 
           </form>
-          {/* Aquí va el código de la tabla de profesores, similar al de instituciones */}
         </div>
       )}
 
-      {/* Sección de Encargados de Estudiantes */}
       {activeSection === 'studentGuardians' && (
         <div id="studentGuardians">
           <div className="flex justify-between items-center mb-6">
@@ -147,7 +143,7 @@ const MainContent = ({ activeSection }) => {
               type="text"
               value={studentName}
               onChange={(e) => setStudentName(e.target.value)}
-              placeholder="Nombre del Estudiante"
+              placeholder="ID del Estudiante"
               className="border p-2 mb-2 w-full"
             />
             <input
@@ -165,7 +161,6 @@ const MainContent = ({ activeSection }) => {
               Registrar Encargado de Estudiante
             </button>
           </form>
-          {/* Aquí va el código de la tabla de encargados de estudiantes, similar al de instituciones */}
         </div>
       )}
     </div>
