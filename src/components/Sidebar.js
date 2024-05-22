@@ -35,9 +35,6 @@ const Sidebar = ({ onSectionClick }) => {
           </li>
         </ul>
       </nav>
-      <button className="mt-auto bg-blue-700 hover:bg-blue-600 text-white py-2 px-4 rounded">
-        Cerrar Sesión
-      </button>
     </div>
   );
 };
