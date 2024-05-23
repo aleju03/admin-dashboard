@@ -1,9 +1,15 @@
+// src/components/Sidebar.js
 import React from 'react';
 
 const Sidebar = ({ onSectionClick }) => {
   return (
     <div className="bg-blue-900 text-white w-1/5 p-6 flex flex-col">
-      <h1 className="text-2xl font-bold mb-8">Panel de Administración</h1>
+      <h1
+        className="text-2xl font-bold mb-8 cursor-pointer"
+        onClick={() => onSectionClick('dashboard')}
+      >
+        Panel de Administración
+      </h1>
       <nav className="flex-1">
         <ul>
           <li className="mb-4">
@@ -31,6 +37,15 @@ const Sidebar = ({ onSectionClick }) => {
               onClick={() => onSectionClick('studentGuardians')}
             >
               Encargados de Estudiantes
+            </button>
+          </li>
+          <li className="mb-4">
+            <button
+              id="groups-link"
+              className="w-full text-left block py-2 px-4 hover:bg-blue-800 rounded"
+              onClick={() => onSectionClick('groups')}
+            >
+              Grupos
             </button>
           </li>
         </ul>
