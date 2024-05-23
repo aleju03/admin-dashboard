@@ -1,33 +1,19 @@
 // src/components/sections/StudentGuardianSection.js
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import StudentGuardianForm from '../StudentGuardianForm';
+import { DataContext } from '../../context/DataContext';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc } from 'firebase/firestore';
 
 const StudentGuardianSection = () => {
+  const { studentGuardians, fetchData } = useContext(DataContext);
   const [showStudentGuardianForm, setShowStudentGuardianForm] = useState(false);
-  const [studentGuardians, setStudentGuardians] = useState([]);
   const [selectedStudentGuardian, setSelectedStudentGuardian] = useState(null);
-
-  useEffect(() => {
-    fetchStudentGuardians();
-  }, []);
-
-  const fetchStudentGuardians = async () => {
-    const usuariosSnapshot = await getDocs(collection(db, 'Usuarios'));
-    const encargadosData = usuariosSnapshot.docs
-      .filter((doc) => doc.data().rol === 'encargado')
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-    setStudentGuardians(encargadosData);
-  };
 
   const handleCloseStudentGuardianForm = () => {
     setShowStudentGuardianForm(false);
     setSelectedStudentGuardian(null);
-    fetchStudentGuardians();
+    fetchData();
   };
 
   const handleEditStudentGuardian = (studentGuardian) => {
@@ -39,7 +25,7 @@ const StudentGuardianSection = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este encargado de estudiante?')) {
       await deleteDoc(doc(db, 'Usuarios', studentGuardianId));
       alert('Encargado de estudiante eliminado exitosamente');
-      fetchStudentGuardians();
+      fetchData();
     }
   };
 

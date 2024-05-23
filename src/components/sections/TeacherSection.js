@@ -1,33 +1,19 @@
 // src/components/sections/TeacherSection.js
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import TeacherForm from '../TeacherForm';
+import { DataContext } from '../../context/DataContext';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc } from 'firebase/firestore';
 
 const TeacherSection = () => {
+  const { teachers, fetchData } = useContext(DataContext);
   const [showTeacherForm, setShowTeacherForm] = useState(false);
-  const [teachers, setTeachers] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
-
-  useEffect(() => {
-    fetchTeachers();
-  }, []);
-
-  const fetchTeachers = async () => {
-    const usuariosSnapshot = await getDocs(collection(db, 'Usuarios'));
-    const docentesData = usuariosSnapshot.docs
-      .filter((doc) => doc.data().rol === 'docente')
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-    setTeachers(docentesData);
-  };
 
   const handleCloseTeacherForm = () => {
     setShowTeacherForm(false);
     setSelectedTeacher(null);
-    fetchTeachers();
+    fetchData();
   };
 
   const handleEditTeacher = (teacher) => {
@@ -39,7 +25,7 @@ const TeacherSection = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este profesor?')) {
       await deleteDoc(doc(db, 'Usuarios', teacherId));
       alert('Profesor eliminado exitosamente');
-      fetchTeachers();
+      fetchData();
     }
   };
 

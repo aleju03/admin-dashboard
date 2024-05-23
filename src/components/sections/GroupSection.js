@@ -1,44 +1,19 @@
 // src/components/sections/GroupSection.js
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import GroupForm from '../GroupForm';
+import { DataContext } from '../../context/DataContext';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, getDoc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc } from 'firebase/firestore';
 
 const GroupSection = () => {
+  const { groups, fetchData } = useContext(DataContext);
   const [showGroupForm, setShowGroupForm] = useState(false);
-  const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
-
-  useEffect(() => {
-    fetchGroups();
-  }, []);
-
-  const fetchGroups = async () => {
-    const gruposSnapshot = await getDocs(collection(db, 'Grupos'));
-    const gruposData = await Promise.all(
-      gruposSnapshot.docs
-        .filter((doc) => doc.data().nombre) // Filtrar grupos vacíos
-        .map(async (doc) => {
-          const grupoData = doc.data();
-          const institucionRef = grupoData.institucion;
-          const docenteRef = grupoData.docente;
-          const institucion = institucionRef ? await getDoc(institucionRef) : null;
-          const docente = docenteRef ? await getDoc(docenteRef) : null;
-          return {
-            id: doc.id,
-            ...grupoData,
-            institucion: institucion && institucion.data() ? institucion.data().nombre : 'Desconocida',
-            docente: docente && docente.data() ? docente.data().nombre : 'Desconocido',
-          };
-        })
-    );
-    setGroups(gruposData);
-  };
 
   const handleCloseGroupForm = () => {
     setShowGroupForm(false);
     setSelectedGroup(null);
-    fetchGroups();
+    fetchData();
   };
 
   const handleEditGroup = (group) => {
@@ -50,9 +25,12 @@ const GroupSection = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este grupo?')) {
       await deleteDoc(doc(db, 'Grupos', groupId));
       alert('Grupo eliminado exitosamente');
-      fetchGroups();
+      fetchData();
     }
   };
+
+  // Filter out any invalid or empty group documents
+  const validGroups = groups.filter(group => group.nombre);
 
   return (
     <div id="groups">
@@ -68,26 +46,18 @@ const GroupSection = () => {
       {showGroupForm && (
         <GroupForm onClose={handleCloseGroupForm} selectedGroup={selectedGroup} />
       )}
-      {groups.length > 0 ? (
+      {validGroups.length > 0 ? (
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead className="bg-gray-800 text-white">
             <tr>
-              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                Nombre
-              </th>
-              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                Institución
-              </th>
-              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                Docente
-              </th>
-              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                Acciones
-              </th>
+              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Nombre</th>
+              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Institución</th>
+              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Docente</th>
+              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Acciones</th>
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {groups.map((group) => (
+            {validGroups.map((group) => (
               <tr key={group.id}>
                 <td className="py-3 px-4">{group.nombre}</td>
                 <td className="py-3 px-4">{group.institucion}</td>

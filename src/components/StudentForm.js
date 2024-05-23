@@ -36,11 +36,13 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const encargadosRefs = encargados.map((encargadoId) => doc(db, 'Usuarios', encargadoId));
+    const encargadosData = encargados.map((encargadoId) =>
+      listaEncargados.find((encargado) => encargado.id === encargadoId)
+    );
 
     const estudianteActualizado = {
       nombre_estudiante: nombreEstudiante,
-      encargados: encargadosRefs,
+      encargados: encargadosData,
     };
 
     onClose(estudianteActualizado);

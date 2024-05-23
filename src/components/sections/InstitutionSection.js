@@ -1,33 +1,19 @@
 // src/components/sections/InstitutionSection.js
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import InstitutionForm from '../InstitutionForm';
+import { DataContext } from '../../context/DataContext';
 import { db } from '../../firebase';
-import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc } from 'firebase/firestore';
 
 const InstitutionSection = () => {
+  const { institutions, fetchData } = useContext(DataContext);
   const [showInstitutionForm, setShowInstitutionForm] = useState(false);
-  const [institutions, setInstitutions] = useState([]);
   const [selectedInstitution, setSelectedInstitution] = useState(null);
-
-  useEffect(() => {
-    fetchInstitutions();
-  }, []);
-
-  const fetchInstitutions = async () => {
-    const institucionesSnapshot = await getDocs(collection(db, 'Instituciones'));
-    const institucionesData = institucionesSnapshot.docs
-      .map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      .filter((institucion) => institucion.nombre);
-    setInstitutions(institucionesData);
-  };
 
   const handleCloseInstitutionForm = () => {
     setShowInstitutionForm(false);
     setSelectedInstitution(null);
-    fetchInstitutions();
+    fetchData();
   };
 
   const handleEditInstitution = (institution) => {
@@ -39,7 +25,7 @@ const InstitutionSection = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar esta institución?')) {
       await deleteDoc(doc(db, 'Instituciones', institutionId));
       alert('Institución eliminada exitosamente');
-      fetchInstitutions();
+      fetchData();
     }
   };
 
@@ -64,21 +50,21 @@ const InstitutionSection = () => {
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead className="bg-gray-800 text-white">
             <tr>
-              <th className="py-3 px-4 uppercase font-semibold text-sm text-left" style={{ width: '20%' }}>ID</th>
-              <th className="py-3 px-4 uppercase font-semibold text-sm text-left" style={{ width: '20%' }}>Nombre</th>
-              <th className="py-3 px-4 uppercase font-semibold text-sm text-left" style={{ width: '20%' }}>Dirección</th>
-              <th className="py-3 px-4 uppercase font-semibold text-sm text-left" style={{ width: '20%' }}>Teléfono</th>
-              <th className="py-3 px-4 uppercase font-semibold text-sm text-left" style={{ width: '20%' }}>Acciones</th>
+              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">ID</th>
+              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Nombre</th>
+              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Dirección</th>
+              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Teléfono</th>
+              <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Acciones</th>
             </tr>
           </thead>
           <tbody className="text-gray-700">
             {institutions.map((institution) => (
               <tr key={institution.id}>
-                <td className="py-3 px-4" style={{ width: '20%' }}>{institution.id}</td>
-                <td className="py-3 px-4" style={{ width: '20%' }}>{institution.nombre}</td>
-                <td className="py-3 px-4" style={{ width: '20%' }}>{institution.direccion}</td>
-                <td className="py-3 px-4" style={{ width: '20%' }}>{institution.telefono}</td>
-                <td className="py-3 px-4" style={{ width: '20%' }}>
+                <td className="py-3 px-4">{institution.id}</td>
+                <td className="py-3 px-4">{institution.nombre}</td>
+                <td className="py-3 px-4">{institution.direccion}</td>
+                <td className="py-3 px-4">{institution.telefono}</td>
+                <td className="py-3 px-4">
                   <button
                     className="bg-orange-500 hover:bg-orange-600 text-white py-1 px-2 rounded mr-2"
                     onClick={() => handleEditInstitution(institution)}
