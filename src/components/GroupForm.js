@@ -179,7 +179,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
             onClick={onClose}
             className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
           >
-            Cancelar
+            Cerrar
           </button>
         </form>
         <div className="mt-8">
