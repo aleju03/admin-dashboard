@@ -1,8 +1,29 @@
 // src/components/GroupForm.js
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { addDoc, collection, doc, getDocs, query, where, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, getDocs, query, where, updateDoc, getDoc } from 'firebase/firestore';
 import StudentForm from './StudentForm';
+
+// Función para obtener los datos de los encargados
+const getEncargadoData = async (encargadoRef) => {
+  const encargadoDoc = await getDoc(encargadoRef);
+  if (encargadoDoc.exists()) {
+    return { id: encargadoDoc.id, ...encargadoDoc.data() };
+  }
+  return null;
+};
+
+// Función para obtener estudiantes con datos de encargados
+const getEstudiantesWithEncargados = async (estudiantes) => {
+  const estudiantesWithEncargados = await Promise.all(estudiantes.map(async (estudiante) => {
+    const encargadosData = await Promise.all(estudiante.encargados.map(getEncargadoData));
+    return {
+      ...estudiante,
+      encargados: encargadosData.filter(encargado => encargado !== null),
+    };
+  }));
+  return estudiantesWithEncargados;
+};
 
 const GroupForm = ({ onClose, selectedGroup }) => {
   const [nombre, setNombre] = useState('');
@@ -43,7 +64,13 @@ const GroupForm = ({ onClose, selectedGroup }) => {
       setNombre(selectedGroup.nombre);
       setInstitucion(selectedGroup.institucion);
       setDocente(selectedGroup.docente);
-      setEstudiantes(selectedGroup.estudiantes || []);
+
+      const fetchEstudiantes = async () => {
+        const estudiantesWithEncargados = await getEstudiantesWithEncargados(selectedGroup.estudiantes || []);
+        setEstudiantes(estudiantesWithEncargados);
+      };
+
+      fetchEstudiantes();
     } else {
       setNombre('');
       setInstitucion('');
@@ -211,7 +238,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
                   <tr key={index}>
                     <td className="py-3 px-4">{estudiante.nombre_estudiante}</td>
                     <td className="py-3 px-4">
-                      {estudiante.encargados && estudiante.encargados.map((encargado) => encargado.nombre).join(', ')}
+                      {estudiante.encargados.map((encargado) => encargado.nombre).join(', ')}
                     </td>
                     <td className="py-3 px-4">
                       <button
