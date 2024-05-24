@@ -9,6 +9,7 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
   const [carne, setCarne] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [institucion, setInstitucion] = useState('');
+  const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     if (selectedTeacher) {
@@ -18,6 +19,10 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
       setInstitucion(selectedTeacher.institucion.id);
     }
   }, [selectedTeacher]);
+
+  useEffect(() => {
+    setIsFormValid(nombre !== '' && carne !== '' && contraseña !== '' && institucion !== '');
+  }, [nombre, carne, contraseña, institucion]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,6 +74,7 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Nombre del Profesor"
             className="border p-2 mb-2 w-full"
+            required
           />
           <input
             type="text"
@@ -76,6 +82,7 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
             onChange={(e) => setCarne(e.target.value)}
             placeholder="Carné del Profesor"
             className="border p-2 mb-2 w-full"
+            required
           />
           <input
             type="password"
@@ -83,22 +90,25 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
             onChange={(e) => setContraseña(e.target.value)}
             placeholder="Contraseña del Profesor"
             className="border p-2 mb-2 w-full"
+            required
           />
           <select
             value={institucion}
             onChange={(e) => setInstitucion(e.target.value)}
             className="border p-2 mb-2 w-full"
+            required
           >
             <option value="" disabled>Seleccionar Institución</option>
-            {institutions.map((inst) => (
-              <option key={inst.id} value={inst.id}>
-                {inst.nombre}
+            {institutions.map((institucion) => (
+              <option key={institucion.id} value={institucion.id}>
+                {institucion.nombre}
               </option>
             ))}
           </select>
           <button
             type="submit"
-            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2"
+            className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!isFormValid}
           >
             {selectedTeacher ? 'Actualizar' : 'Registrar'}
           </button>

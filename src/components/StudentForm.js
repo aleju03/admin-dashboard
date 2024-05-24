@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { DataContext } from '../context/DataContext';
+import { doc } from 'firebase/firestore';
+import { db } from '../firebase';
 
 const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
   const { studentGuardians } = useContext(DataContext);
@@ -9,7 +11,7 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
   useEffect(() => {
     if (selectedStudent) {
       setNombreEstudiante(selectedStudent.nombre_estudiante);
-      setEncargados(selectedStudent.encargados.map((encargado) => encargado.id));
+      setEncargados(selectedStudent.encargados.map((encargadoRef) => encargadoRef.id));
     } else {
       setNombreEstudiante('');
       setEncargados([]);
@@ -19,13 +21,13 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const encargadosData = encargados.map((encargadoId) =>
-      studentGuardians.find((encargado) => encargado.id === encargadoId)
+    const encargadosRefs = encargados.map((encargadoId) =>
+      doc(db, 'Usuarios', encargadoId)
     );
 
     const estudianteActualizado = {
       nombre_estudiante: nombreEstudiante,
-      encargados: encargadosData,
+      encargados: encargadosRefs,
     };
 
     onClose(estudianteActualizado);

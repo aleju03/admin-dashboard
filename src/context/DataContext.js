@@ -1,5 +1,4 @@
 // src/context/DataContext.js
-//maneja todos los datos en un solo lugar para eliminar tiempos de carga innecesarios
 import React, { createContext, useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs, getDoc } from 'firebase/firestore';

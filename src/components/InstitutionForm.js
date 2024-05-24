@@ -1,4 +1,3 @@
-// src/components/InstitutionForm.js
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
@@ -7,6 +6,7 @@ const InstitutionForm = ({ onClose, selectedInstitution }) => {
   const [nombre, setNombre] = useState('');
   const [direccion, setDireccion] = useState('');
   const [telefono, setTelefono] = useState('');
+  const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     if (selectedInstitution) {
@@ -15,6 +15,17 @@ const InstitutionForm = ({ onClose, selectedInstitution }) => {
       setTelefono(selectedInstitution.telefono);
     }
   }, [selectedInstitution]);
+
+  useEffect(() => {
+    setIsFormValid(nombre !== '' && direccion !== '' && telefono !== '');
+  }, [nombre, direccion, telefono]);
+
+  const handleTelefonoChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setTelefono(value);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,16 +83,17 @@ const InstitutionForm = ({ onClose, selectedInstitution }) => {
             required
           />
           <input
-            type="text"
+            type="tel"
             value={telefono}
-            onChange={(e) => setTelefono(e.target.value)}
+            onChange={handleTelefonoChange}
             placeholder="Teléfono de la Institución"
             className="border p-2 mb-2 w-full"
             required
           />
           <button
             type="submit"
-            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2"
+            className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!isFormValid}
           >
             {selectedInstitution ? 'Actualizar' : 'Registrar'}
           </button>

@@ -9,6 +9,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
   const [carne, setCarne] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [institucion, setInstitucion] = useState('');
+  const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     if (selectedStudentGuardian) {
@@ -18,6 +19,10 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
       setInstitucion(selectedStudentGuardian.institucion.id);
     }
   }, [selectedStudentGuardian]);
+
+  useEffect(() => {
+    setIsFormValid(nombre !== '' && carne !== '' && contraseña !== '' && institucion !== '');
+  }, [nombre, carne, contraseña, institucion]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -69,6 +74,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Nombre del Encargado"
             className="border p-2 mb-2 w-full"
+            required
           />
           <input
             type="text"
@@ -76,6 +82,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
             onChange={(e) => setCarne(e.target.value)}
             placeholder="Carné del Encargado"
             className="border p-2 mb-2 w-full"
+            required
           />
           <input
             type="password"
@@ -83,11 +90,13 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
             onChange={(e) => setContraseña(e.target.value)}
             placeholder="Contraseña del Encargado"
             className="border p-2 mb-2 w-full"
+            required
           />
           <select
             value={institucion}
             onChange={(e) => setInstitucion(e.target.value)}
             className="border p-2 mb-2 w-full"
+            required
           >
             <option value="" disabled>Seleccionar Institución</option>
             {institutions.map((institucion) => (
@@ -98,7 +107,8 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
           </select>
           <button
             type="submit"
-            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2"
+            className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!isFormValid}
           >
             {selectedStudentGuardian ? 'Actualizar' : 'Registrar'}
           </button>

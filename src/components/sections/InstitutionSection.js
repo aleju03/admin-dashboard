@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react';
 import InstitutionForm from '../InstitutionForm';
 import { DataContext } from '../../context/DataContext';
 import { db } from '../../firebase';
-import { doc, deleteDoc } from 'firebase/firestore';
+import { doc, deleteDoc, getDocs, query, collection, where } from 'firebase/firestore';
 
 const InstitutionSection = () => {
   const { institutions, fetchData } = useContext(DataContext);
@@ -22,10 +22,47 @@ const InstitutionSection = () => {
   };
 
   const handleDeleteInstitution = async (institutionId) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar esta institución?')) {
-      await deleteDoc(doc(db, 'Instituciones', institutionId));
-      alert('Institución eliminada exitosamente');
-      fetchData();
+    const confirmDelete = window.confirm(
+      'Al eliminar esta institución, se eliminarán todos los profesores, encargados y grupos relacionados. ¿Estás seguro de que deseas eliminar esta institución?'
+    );
+  
+    if (confirmDelete) {
+      try {
+        // Obtener los profesores relacionados con la institución
+        const teachersSnapshot = await getDocs(
+          query(collection(db, 'Usuarios'), where('institucion', '==', doc(db, 'Instituciones', institutionId)), where('rol', '==', 'docente'))
+        );
+        const teachersToDelete = teachersSnapshot.docs.map((doc) => doc.ref);
+  
+        // Obtener los encargados relacionados con la institución
+        const guardianssSnapshot = await getDocs(
+          query(collection(db, 'Usuarios'), where('institucion', '==', doc(db, 'Instituciones', institutionId)), where('rol', '==', 'encargado'))
+        );
+        const guardiansToDelete = guardianssSnapshot.docs.map((doc) => doc.ref);
+  
+        // Obtener los grupos relacionados con la institución
+        const groupsSnapshot = await getDocs(
+          query(collection(db, 'Grupos'), where('institucion', '==', doc(db, 'Instituciones', institutionId)))
+        );
+        const groupsToDelete = groupsSnapshot.docs.map((doc) => doc.ref);
+  
+        // Eliminar los profesores, encargados y grupos relacionados
+        const deletePromises = [
+          ...teachersToDelete.map((ref) => deleteDoc(ref)),
+          ...guardiansToDelete.map((ref) => deleteDoc(ref)),
+          ...groupsToDelete.map((ref) => deleteDoc(ref)),
+        ];
+        await Promise.all(deletePromises);
+  
+        // Eliminar la institución
+        await deleteDoc(doc(db, 'Instituciones', institutionId));
+  
+        alert('Institución y documentos relacionados eliminados exitosamente');
+        fetchData();
+      } catch (error) {
+        console.error('Error al eliminar la institución y los documentos relacionados:', error);
+        alert('Ocurrió un error al eliminar la institución y los documentos relacionados');
+      }
     }
   };
 

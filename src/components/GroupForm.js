@@ -33,6 +33,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
   const [estudiantes, setEstudiantes] = useState([]);
   const [showStudentForm, setShowStudentForm] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     if (selectedGroup) {
@@ -53,6 +54,10 @@ const GroupForm = ({ onClose, selectedGroup }) => {
       setEstudiantes([]);
     }
   }, [selectedGroup]);
+
+  useEffect(() => {
+    setIsFormValid(nombre !== '' && institucion !== '' && docente !== '');
+  }, [nombre, institucion, docente]);
 
   const handleSubmit = async () => {
     try {
@@ -173,7 +178,8 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           <button
             type="button"
             onClick={handleSubmit}
-            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2"
+            className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!isFormValid}
           >
             {selectedGroup ? 'Actualizar' : 'Registrar'}
           </button>
