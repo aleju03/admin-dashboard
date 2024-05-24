@@ -103,7 +103,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
     }
   };
 
-  const handleCloseStudentForm = (estudianteAgregado) => {
+  const handleCloseStudentForm = async (estudianteAgregado) => {
     setShowStudentForm(false);
     setSelectedStudent(null);
     if (estudianteAgregado) {
@@ -113,7 +113,17 @@ const GroupForm = ({ onClose, selectedGroup }) => {
         );
         setEstudiantes(estudiantesActualizados);
       } else {
-        setEstudiantes([...estudiantes, estudianteAgregado]);
+        const encargadosData = await Promise.all(
+          estudianteAgregado.encargados.map(async (encargadoRef) => {
+            const encargadoDoc = await getDoc(encargadoRef);
+            return encargadoDoc.data();
+          })
+        );
+        const estudianteConEncargados = {
+          ...estudianteAgregado,
+          encargados: encargadosData,
+        };
+        setEstudiantes([...estudiantes, estudianteConEncargados]);
       }
     }
   };
@@ -139,7 +149,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg p-8 shadow-lg">
+      <div className="bg-white rounded-lg p-8 shadow-lg max-h-[80vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4">
           {selectedGroup ? 'Editar Grupo' : 'Agregar Nuevo Grupo'}
         </h2>
@@ -201,45 +211,47 @@ const GroupForm = ({ onClose, selectedGroup }) => {
             Agregar Estudiante
           </button>
           {estudiantes.length > 0 ? (
-            <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-              <thead className="bg-gray-800 text-white">
-                <tr>
-                  <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                    Nombre
-                  </th>
-                  <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                    Encargados
-                  </th>
-                  <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-700">
-                {estudiantes.map((estudiante, index) => (
-                  <tr key={index}>
-                    <td className="py-3 px-4">{estudiante.nombre_estudiante}</td>
-                    <td className="py-3 px-4">
-                      {estudiante.encargados.map((encargado) => encargado.nombre).join(', ')}
-                    </td>
-                    <td className="py-3 px-4">
-                      <button
-                        className="bg-orange-500 hover:bg-orange-600 text-white py-1 px-2 rounded mr-2"
-                        onClick={() => handleEditStudent(estudiante)}
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded"
-                        onClick={() => handleDeleteStudent(estudiante)}
-                      >
-                        Eliminar
-                      </button>
-                    </td>
+            <div className="max-h-[40vh] overflow-y-auto">
+              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead className="bg-gray-800 text-white">
+                  <tr>
+                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
+                      Nombre
+                    </th>
+                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
+                      Encargados
+                    </th>
+                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
+                      Acciones
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="text-gray-700">
+                  {estudiantes.map((estudiante, index) => (
+                    <tr key={index}>
+                      <td className="py-3 px-4">{estudiante.nombre_estudiante}</td>
+                      <td className="py-3 px-4">
+                        {estudiante.encargados.map((encargado) => encargado.nombre).join(', ')}
+                      </td>
+                      <td className="py-3 px-4">
+                        <button
+                          className="bg-orange-500 hover:bg-orange-600 text-white py-1 px-2 rounded mr-2"
+                          onClick={() => handleEditStudent(estudiante)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded"
+                          onClick={() => handleDeleteStudent(estudiante)}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : null}
         </div>
         {showStudentForm && (
