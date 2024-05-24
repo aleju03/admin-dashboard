@@ -2,7 +2,7 @@
 import React, { useContext } from 'react';
 import { DataContext } from '../../context/DataContext';
 import { AcademicCapIcon, UserGroupIcon, UsersIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
-import { ClockLoader } from 'react-spinners';
+import { ClimbingBoxLoader } from 'react-spinners';
 
 const DashboardStats = ({ onSectionChange }) => {
   const { institutions, teachers, studentGuardians, groups, loading } = useContext(DataContext);
@@ -11,7 +11,7 @@ const DashboardStats = ({ onSectionChange }) => {
     <div className="flex justify-center items-center h-full">
       {loading ? (
         <div className="animate-fade-in">
-          <ClockLoader color="#3B82F6" size={80} />
+          <ClimbingBoxLoader color="#3B82F6" size={80} />
         </div>
       ) : (
         <div className="text-center">

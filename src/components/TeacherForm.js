@@ -1,36 +1,20 @@
-// src/components/TeacherForm.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { db } from '../firebase';
-import { addDoc, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { DataContext } from '../context/DataContext';
 
 const TeacherForm = ({ onClose, selectedTeacher }) => {
+  const { institutions } = useContext(DataContext);
   const [nombre, setNombre] = useState('');
   const [carne, setCarne] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [institucion, setInstitucion] = useState('');
-  const [instituciones, setInstituciones] = useState([]);
-
-  useEffect(() => {
-    const fetchInstituciones = async () => {
-      const institucionesSnapshot = await getDocs(collection(db, 'Instituciones'));
-      const institucionesData = institucionesSnapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        .filter((institucion) => institucion.nombre); // Filtrar instituciones vacías
-      setInstituciones(institucionesData);
-    };
-
-    fetchInstituciones();
-  }, []);
 
   useEffect(() => {
     if (selectedTeacher) {
       setNombre(selectedTeacher.nombre);
       setCarne(selectedTeacher.carne);
       setContraseña(selectedTeacher.contraseña);
-      // Asegúrate de establecer el ID de la institución, no el nombre
       setInstitucion(selectedTeacher.institucion.id);
     }
   }, [selectedTeacher]);
@@ -41,7 +25,7 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
     const institucionRef = doc(db, 'Instituciones', institucion);
 
     if (selectedTeacher) {
-      // Editar profesor existente
+      // Edit existing teacher
       try {
         await updateDoc(doc(db, 'Usuarios', selectedTeacher.id), {
           nombre,
@@ -55,7 +39,7 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
         alert('Error al actualizar el profesor: ' + error.message);
       }
     } else {
-      // Agregar nuevo profesor
+      // Add new teacher
       try {
         await addDoc(collection(db, 'Usuarios'), {
           nombre,
@@ -105,8 +89,8 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
             onChange={(e) => setInstitucion(e.target.value)}
             className="border p-2 mb-2 w-full"
           >
-            <option value="">Seleccionar Institución</option>
-            {instituciones.map((inst) => (
+            <option value="" disabled>Seleccionar Institución</option>
+            {institutions.map((inst) => (
               <option key={inst.id} value={inst.id}>
                 {inst.nombre}
               </option>

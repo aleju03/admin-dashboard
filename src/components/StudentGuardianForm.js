@@ -1,29 +1,14 @@
-// src/components/StudentGuardianForm.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { db } from '../firebase';
-import { addDoc, collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { DataContext } from '../context/DataContext';
 
 const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
+  const { institutions } = useContext(DataContext);
   const [nombre, setNombre] = useState('');
   const [carne, setCarne] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [institucion, setInstitucion] = useState('');
-  const [instituciones, setInstituciones] = useState([]);
-
-  useEffect(() => {
-    const fetchInstituciones = async () => {
-      const institucionesSnapshot = await getDocs(collection(db, 'Instituciones'));
-      const institucionesData = institucionesSnapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        .filter((institucion) => institucion.nombre); // Filtrar instituciones vacías
-      setInstituciones(institucionesData);
-    };
-
-    fetchInstituciones();
-  }, []);
 
   useEffect(() => {
     if (selectedStudentGuardian) {
@@ -40,7 +25,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
     const institucionRef = doc(db, 'Instituciones', institucion);
 
     if (selectedStudentGuardian) {
-      // Editar encargado existente
+      // Edit existing student guardian
       try {
         await updateDoc(doc(db, 'Usuarios', selectedStudentGuardian.id), {
           nombre,
@@ -54,7 +39,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
         alert('Error al actualizar el encargado: ' + error.message);
       }
     } else {
-      // Agregar nuevo encargado
+      // Add new student guardian
       try {
         await addDoc(collection(db, 'Usuarios'), {
           nombre,
@@ -105,7 +90,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
             className="border p-2 mb-2 w-full"
           >
             <option value="" disabled>Seleccionar Institución</option>
-            {instituciones.map((institucion) => (
+            {institutions.map((institucion) => (
               <option key={institucion.id} value={institucion.id}>
                 {institucion.nombre}
               </option>

@@ -1,10 +1,10 @@
-// src/components/GroupForm.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { db } from '../firebase';
-import { addDoc, collection, doc, getDocs, query, where, updateDoc, getDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, query, where, updateDoc, getDocs, getDoc } from 'firebase/firestore';
+import { DataContext } from '../context/DataContext';
 import StudentForm from './StudentForm';
 
-// Función para obtener los datos de los encargados
+// Function to get data of the responsible
 const getEncargadoData = async (encargadoRef) => {
   const encargadoDoc = await getDoc(encargadoRef);
   if (encargadoDoc.exists()) {
@@ -13,7 +13,7 @@ const getEncargadoData = async (encargadoRef) => {
   return null;
 };
 
-// Función para obtener estudiantes con datos de encargados
+// Function to get students with data of responsible
 const getEstudiantesWithEncargados = async (estudiantes) => {
   const estudiantesWithEncargados = await Promise.all(estudiantes.map(async (estudiante) => {
     const encargadosData = await Promise.all(estudiante.encargados.map(getEncargadoData));
@@ -26,38 +26,13 @@ const getEstudiantesWithEncargados = async (estudiantes) => {
 };
 
 const GroupForm = ({ onClose, selectedGroup }) => {
+  const { institutions, teachers, fetchData } = useContext(DataContext);
   const [nombre, setNombre] = useState('');
   const [institucion, setInstitucion] = useState('');
   const [docente, setDocente] = useState('');
-  const [instituciones, setInstituciones] = useState([]);
-  const [docentes, setDocentes] = useState([]);
+  const [estudiantes, setEstudiantes] = useState([]);
   const [showStudentForm, setShowStudentForm] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  const [estudiantes, setEstudiantes] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const institucionesSnapshot = await getDocs(collection(db, 'Instituciones'));
-      const institucionesData = institucionesSnapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        .filter((institucion) => institucion.nombre);
-      setInstituciones(institucionesData);
-
-      const docentesSnapshot = await getDocs(collection(db, 'Usuarios'));
-      const docentesData = docentesSnapshot.docs
-        .filter((doc) => doc.data().rol === 'docente')
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-      setDocentes(docentesData);
-    };
-
-    fetchData();
-  }, []);
 
   useEffect(() => {
     if (selectedGroup) {
@@ -117,6 +92,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
       setDocente('');
       setEstudiantes([]);
       onClose();
+      fetchData();
     } catch (error) {
       alert('Error al guardar el grupo: ' + error.message);
     }
@@ -176,7 +152,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
             className="border p-2 mb-2 w-full"
           >
             <option value="" disabled>Seleccionar Institución</option>
-            {instituciones.map((institucion) => (
+            {institutions.map((institucion) => (
               <option key={institucion.id} value={institucion.nombre}>
                 {institucion.nombre}
               </option>
@@ -188,7 +164,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
             className="border p-2 mb-2 w-full"
           >
             <option value="" disabled>Seleccionar Docente</option>
-            {docentes.map((docente) => (
+            {teachers.map((docente) => (
               <option key={docente.id} value={docente.nombre}>
                 {docente.nombre}
               </option>

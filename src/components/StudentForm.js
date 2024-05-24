@@ -1,27 +1,10 @@
-// src/components/StudentForm.js
-import React, { useState, useEffect } from 'react';
-import { db } from '../firebase';
-import { collection, getDocs, doc } from 'firebase/firestore';
+import React, { useState, useEffect, useContext } from 'react';
+import { DataContext } from '../context/DataContext';
 
 const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
+  const { studentGuardians } = useContext(DataContext);
   const [nombreEstudiante, setNombreEstudiante] = useState('');
   const [encargados, setEncargados] = useState([]);
-  const [listaEncargados, setListaEncargados] = useState([]);
-
-  useEffect(() => {
-    const fetchEncargados = async () => {
-      const encargadosSnapshot = await getDocs(collection(db, 'Usuarios'));
-      const encargadosData = encargadosSnapshot.docs
-        .filter((doc) => doc.data().rol === 'encargado')
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-      setListaEncargados(encargadosData);
-    };
-
-    fetchEncargados();
-  }, []);
 
   useEffect(() => {
     if (selectedStudent) {
@@ -37,7 +20,7 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
     e.preventDefault();
 
     const encargadosData = encargados.map((encargadoId) =>
-      listaEncargados.find((encargado) => encargado.id === encargadoId)
+      studentGuardians.find((encargado) => encargado.id === encargadoId)
     );
 
     const estudianteActualizado = {
@@ -71,7 +54,7 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
             }
             className="border p-2 mb-2 w-full"
           >
-            {listaEncargados.map((encargado) => (
+            {studentGuardians.map((encargado) => (
               <option key={encargado.id} value={encargado.id}>
                 {encargado.nombre}
               </option>
