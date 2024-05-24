@@ -6,28 +6,26 @@ import { db } from '../firebase';
 const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
   const { studentGuardians } = useContext(DataContext);
   const [nombreEstudiante, setNombreEstudiante] = useState('');
-  const [encargados, setEncargados] = useState([]);
+  const [encargado, setEncargado] = useState('');
 
   useEffect(() => {
     if (selectedStudent) {
       setNombreEstudiante(selectedStudent.nombre_estudiante);
-      setEncargados(selectedStudent.encargados.map((encargadoRef) => encargadoRef.id));
+      setEncargado(selectedStudent.encargado.id);
     } else {
       setNombreEstudiante('');
-      setEncargados([]);
+      setEncargado('');
     }
   }, [selectedStudent]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const encargadosRefs = encargados.map((encargadoId) =>
-      doc(db, 'Usuarios', encargadoId)
-    );
+    const encargadoRef = doc(db, 'Usuarios', encargado);
 
     const estudianteActualizado = {
       nombre_estudiante: nombreEstudiante,
-      encargados: encargadosRefs,
+      encargado: encargadoRef,
     };
 
     onClose(estudianteActualizado);
@@ -49,13 +47,11 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
             required
           />
           <select
-            multiple
-            value={encargados}
-            onChange={(e) =>
-              setEncargados(Array.from(e.target.selectedOptions, (option) => option.value))
-            }
+            value={encargado}
+            onChange={(e) => setEncargado(e.target.value)}
             className="border p-2 mb-2 w-full"
           >
+            <option value="">Seleccionar Encargado</option>
             {studentGuardians.map((encargado) => (
               <option key={encargado.id} value={encargado.id}>
                 {encargado.nombre}

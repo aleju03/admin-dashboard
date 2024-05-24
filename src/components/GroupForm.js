@@ -4,7 +4,7 @@ import { addDoc, collection, doc, query, where, updateDoc, getDocs, getDoc } fro
 import { DataContext } from '../context/DataContext';
 import StudentForm from './StudentForm';
 
-// Function to get data of the responsible
+// Function to get data of the guardian
 const getEncargadoData = async (encargadoRef) => {
   const encargadoDoc = await getDoc(encargadoRef);
   if (encargadoDoc.exists()) {
@@ -13,13 +13,13 @@ const getEncargadoData = async (encargadoRef) => {
   return null;
 };
 
-// Function to get students with data of responsible
+// Function to get students with guardian data
 const getEstudiantesWithEncargados = async (estudiantes) => {
   const estudiantesWithEncargados = await Promise.all(estudiantes.map(async (estudiante) => {
-    const encargadosData = await Promise.all(estudiante.encargados.map(getEncargadoData));
+    const encargadoData = await getEncargadoData(estudiante.encargado);
     return {
       ...estudiante,
-      encargados: encargadosData.filter(encargado => encargado !== null),
+      encargado: encargadoData,
     };
   }));
   return estudiantesWithEncargados;
@@ -82,7 +82,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           docente: docenteRef,
           estudiantes: estudiantes.map(estudiante => ({
             nombre_estudiante: estudiante.nombre_estudiante,
-            encargados: estudiante.encargados.map(encargado => doc(db, 'Usuarios', encargado.id))
+            encargado: doc(db, 'Usuarios', estudiante.encargado.id)
           })),
         });
         alert('Grupo actualizado exitosamente');
@@ -93,7 +93,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           docente: docenteRef,
           estudiantes: estudiantes.map(estudiante => ({
             nombre_estudiante: estudiante.nombre_estudiante,
-            encargados: estudiante.encargados.map(encargado => doc(db, 'Usuarios', encargado.id))
+            encargado: doc(db, 'Usuarios', estudiante.encargado.id)
           })),
         });
         alert('Grupo registrado exitosamente');
@@ -113,16 +113,16 @@ const GroupForm = ({ onClose, selectedGroup }) => {
     setShowStudentForm(false);
     setSelectedStudent(null);
     if (estudianteAgregado) {
-      const encargadosData = await getEstudiantesWithEncargados([estudianteAgregado]);
-      const estudianteConEncargados = encargadosData[0];
+      const encargadoData = await getEstudiantesWithEncargados([estudianteAgregado]);
+      const estudianteConEncargado = encargadoData[0];
 
       if (selectedStudent) {
         const estudiantesActualizados = estudiantes.map((estudiante) =>
-          estudiante.nombre_estudiante === selectedStudent.nombre_estudiante ? estudianteConEncargados : estudiante
+          estudiante.nombre_estudiante === selectedStudent.nombre_estudiante ? estudianteConEncargado : estudiante
         );
         setEstudiantes(estudiantesActualizados);
       } else {
-        setEstudiantes([...estudiantes, estudianteConEncargados]);
+        setEstudiantes([...estudiantes, estudianteConEncargado]);
       }
     }
   };
@@ -215,7 +215,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
                 <thead className="bg-gray-800 text-white">
                   <tr>
                     <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Nombre</th>
-                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Encargados</th>
+                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Encargado</th>
                     <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Acciones</th>
                   </tr>
                 </thead>
@@ -223,7 +223,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
                   {estudiantes.map((estudiante, index) => (
                     <tr key={index}>
                       <td className="py-3 px-4">{estudiante.nombre_estudiante}</td>
-                      <td className="py-3 px-4">{estudiante.encargados.map((encargado) => encargado.nombre).join(', ')}</td>
+                      <td className="py-3 px-4">{estudiante.encargado ? estudiante.encargado.nombre : 'No Asignado'}</td>
                       <td className="py-3 px-4">
                         <button
                           className="bg-orange-500 hover:bg-orange-600 text-white py-1 px-2 rounded mr-2"
