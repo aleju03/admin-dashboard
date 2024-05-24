@@ -7,6 +7,7 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
   const { studentGuardians } = useContext(DataContext);
   const [nombreEstudiante, setNombreEstudiante] = useState('');
   const [encargado, setEncargado] = useState('');
+  const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     if (selectedStudent) {
@@ -17,6 +18,10 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
       setEncargado('');
     }
   }, [selectedStudent]);
+
+  useEffect(() => {
+    setIsFormValid(nombreEstudiante !== '' && encargado !== '');
+  }, [nombreEstudiante, encargado]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -50,8 +55,9 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
             value={encargado}
             onChange={(e) => setEncargado(e.target.value)}
             className="border p-2 mb-2 w-full"
+            required
           >
-            <option value="">Seleccionar Encargado</option>
+            <option value="" disabled>Seleccionar Encargado</option>
             {studentGuardians.map((encargado) => (
               <option key={encargado.id} value={encargado.id}>
                 {encargado.nombre}
@@ -60,7 +66,8 @@ const StudentForm = ({ onClose, selectedGroup, selectedStudent }) => {
           </select>
           <button
             type="submit"
-            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2"
+            className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!isFormValid}
           >
             {selectedStudent ? 'Actualizar' : 'Agregar'}
           </button>
