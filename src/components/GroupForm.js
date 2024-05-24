@@ -80,7 +80,10 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           nombre,
           institucion: institucionRef,
           docente: docenteRef,
-          estudiantes: estudiantes,
+          estudiantes: estudiantes.map(estudiante => ({
+            nombre_estudiante: estudiante.nombre_estudiante,
+            encargados: estudiante.encargados.map(encargado => doc(db, 'Usuarios', encargado.id))
+          })),
         });
         alert('Grupo actualizado exitosamente');
       } else {
@@ -88,7 +91,10 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           nombre,
           institucion: institucionRef,
           docente: docenteRef,
-          estudiantes: estudiantes,
+          estudiantes: estudiantes.map(estudiante => ({
+            nombre_estudiante: estudiante.nombre_estudiante,
+            encargados: estudiante.encargados.map(encargado => doc(db, 'Usuarios', encargado.id))
+          })),
         });
         alert('Grupo registrado exitosamente');
       }
@@ -103,21 +109,19 @@ const GroupForm = ({ onClose, selectedGroup }) => {
     }
   };
 
-const handleCloseStudentForm = async (estudianteAgregado) => {
+  const handleCloseStudentForm = async (estudianteAgregado) => {
     setShowStudentForm(false);
     setSelectedStudent(null);
     if (estudianteAgregado) {
+      const encargadosData = await getEstudiantesWithEncargados([estudianteAgregado]);
+      const estudianteConEncargados = encargadosData[0];
+
       if (selectedStudent) {
         const estudiantesActualizados = estudiantes.map((estudiante) =>
-          estudiante.nombre_estudiante === selectedStudent.nombre_estudiante ? estudianteAgregado : estudiante
+          estudiante.nombre_estudiante === selectedStudent.nombre_estudiante ? estudianteConEncargados : estudiante
         );
         setEstudiantes(estudiantesActualizados);
       } else {
-        // Conservar solo las referencias de los documentos
-        const estudianteConEncargados = {
-          ...estudianteAgregado,
-          encargados: estudianteAgregado.encargados,
-        };
         setEstudiantes([...estudiantes, estudianteConEncargados]);
       }
     }
