@@ -10,7 +10,6 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
   const [carne, setCarne] = useState('');
   const [contraseña, setContraseña] = useState('');
   const [institucion, setInstitucion] = useState('');
-  const [isFormValid, setIsFormValid] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   useEffect(() => {
@@ -21,10 +20,6 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
       setInstitucion(selectedTeacher.institucion.id);
     }
   }, [selectedTeacher]);
-
-  useEffect(() => {
-    setIsFormValid(nombre !== '' && carne !== '' && contraseña !== '' && institucion !== '');
-  }, [nombre, carne, contraseña, institucion]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -170,10 +165,7 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
           </select>
           <button
             type="submit"
-            className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2 ${
-              !isFormValid ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            disabled={!isFormValid}
+            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2"
           >
             {selectedTeacher ? 'Actualizar' : 'Registrar'}
           </button>

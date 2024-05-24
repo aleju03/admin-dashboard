@@ -12,7 +12,6 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
   const [institucion, setInstitucion] = useState('');
   const [estudiantes, setEstudiantes] = useState([]);
   const [nombreEstudiante, setNombreEstudiante] = useState('');
-  const [isFormValid, setIsFormValid] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   useEffect(() => {
@@ -24,10 +23,6 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
       setEstudiantes(selectedStudentGuardian.estudiantes || []);
     }
   }, [selectedStudentGuardian]);
-
-  useEffect(() => {
-    setIsFormValid(nombre !== '' && carne !== '' && contraseña !== '' && institucion !== '' && estudiantes.length > 0);
-  }, [nombre, carne, contraseña, institucion, estudiantes]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -216,10 +211,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
           )}
           <button
             type="submit"
-            className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2 ${
-              !isFormValid ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            disabled={!isFormValid}
+            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2"
           >
             {selectedStudentGuardian ? 'Actualizar' : 'Registrar'}
           </button>

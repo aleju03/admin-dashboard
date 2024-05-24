@@ -6,7 +6,6 @@ const InstitutionForm = ({ onClose, selectedInstitution, fetchInstitutions }) =>
   const [nombre, setNombre] = useState('');
   const [direccion, setDireccion] = useState('');
   const [telefono, setTelefono] = useState('');
-  const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
     if (selectedInstitution) {
@@ -15,10 +14,6 @@ const InstitutionForm = ({ onClose, selectedInstitution, fetchInstitutions }) =>
       setTelefono(selectedInstitution.telefono);
     }
   }, [selectedInstitution]);
-
-  useEffect(() => {
-    setIsFormValid(nombre !== '' && direccion !== '' && telefono !== '');
-  }, [nombre, direccion, telefono]);
 
   const handleTelefonoChange = (e) => {
     const value = e.target.value;
@@ -94,8 +89,7 @@ const InstitutionForm = ({ onClose, selectedInstitution, fetchInstitutions }) =>
           />
           <button
             type="submit"
-            className={`bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2 ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={!isFormValid}
+            className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2"
           >
             {selectedInstitution ? 'Actualizar' : 'Registrar'}
           </button>
