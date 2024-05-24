@@ -1,4 +1,3 @@
-// src/components/sections/GroupSection.js
 import React, { useContext, useState } from 'react';
 import GroupForm from '../GroupForm';
 import { DataContext } from '../../context/DataContext';
@@ -29,9 +28,6 @@ const GroupSection = () => {
     }
   };
 
-  // Filter out any invalid or empty group documents
-  const validGroups = groups.filter(group => group.nombre);
-
   return (
     <div id="groups">
       <div className="flex justify-between items-center mb-6">
@@ -46,7 +42,7 @@ const GroupSection = () => {
       {showGroupForm && (
         <GroupForm onClose={handleCloseGroupForm} selectedGroup={selectedGroup} />
       )}
-      {validGroups.length > 0 ? (
+      {groups.length > 0 ? (
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
           <thead className="bg-gray-800 text-white">
             <tr>
@@ -57,7 +53,7 @@ const GroupSection = () => {
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {validGroups.map((group) => (
+            {groups.map((group) => (
               <tr key={group.id}>
                 <td className="py-3 px-4">{group.nombre}</td>
                 <td className="py-3 px-4">{group.institucion}</td>

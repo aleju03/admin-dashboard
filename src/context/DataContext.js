@@ -1,9 +1,27 @@
-// src/context/DataContext.js
 import React, { createContext, useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs, getDoc } from 'firebase/firestore';
 
 export const DataContext = createContext();
+
+const getEncargadoData = async (encargadoRef) => {
+  const encargadoDoc = await getDoc(encargadoRef);
+  if (encargadoDoc.exists()) {
+    return { id: encargadoDoc.id, ...encargadoDoc.data() };
+  }
+  return null;
+};
+
+const getEstudiantesWithEncargados = async (estudiantes) => {
+  const estudiantesWithEncargados = await Promise.all(estudiantes.map(async (estudiante) => {
+    const encargadoData = await getEncargadoData(estudiante.encargado);
+    return {
+      ...estudiante,
+      encargado: encargadoData,
+    };
+  }));
+  return estudiantesWithEncargados;
+};
 
 export const DataProvider = ({ children }) => {
   const [institutions, setInstitutions] = useState([]);
@@ -37,11 +55,13 @@ export const DataProvider = ({ children }) => {
         const grupoData = doc.data();
         const institucion = grupoData.institucion ? await getDoc(grupoData.institucion) : null;
         const docente = grupoData.docente ? await getDoc(grupoData.docente) : null;
+        const estudiantesWithEncargados = await getEstudiantesWithEncargados(grupoData.estudiantes || []);
         return {
           id: doc.id,
           ...grupoData,
           institucion: institucion ? institucion.data().nombre : 'Desconocida',
           docente: docente ? docente.data().nombre : 'Desconocido',
+          estudiantes: estudiantesWithEncargados,
         };
       })
     );

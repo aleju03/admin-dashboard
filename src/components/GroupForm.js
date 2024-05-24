@@ -13,18 +13,6 @@ const getEncargadoData = async (encargadoRef) => {
   return null;
 };
 
-// Function to get students with guardian data
-const getEstudiantesWithEncargados = async (estudiantes) => {
-  const estudiantesWithEncargados = await Promise.all(estudiantes.map(async (estudiante) => {
-    const encargadoData = await getEncargadoData(estudiante.encargado);
-    return {
-      ...estudiante,
-      encargado: encargadoData,  // Single guardian object
-    };
-  }));
-  return estudiantesWithEncargados;
-};
-
 const GroupForm = ({ onClose, selectedGroup }) => {
   const { institutions, teachers, fetchData } = useContext(DataContext);
   const [nombre, setNombre] = useState('');
@@ -40,13 +28,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
       setNombre(selectedGroup.nombre);
       setInstitucion(selectedGroup.institucion);
       setDocente(selectedGroup.docente);
-
-      const fetchEstudiantes = async () => {
-        const estudiantesWithEncargados = await getEstudiantesWithEncargados(selectedGroup.estudiantes || []);
-        setEstudiantes(estudiantesWithEncargados);
-      };
-
-      fetchEstudiantes();
+      setEstudiantes(selectedGroup.estudiantes);
     } else {
       setNombre('');
       setInstitucion('');
@@ -82,7 +64,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           docente: docenteRef,
           estudiantes: estudiantes.map(estudiante => ({
             nombre_estudiante: estudiante.nombre_estudiante,
-            encargado: doc(db, 'Usuarios', estudiante.encargado.id)  // Single guardian reference
+            encargado: doc(db, 'Usuarios', estudiante.encargado.id)
           })),
         });
         alert('Grupo actualizado exitosamente');
@@ -93,7 +75,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           docente: docenteRef,
           estudiantes: estudiantes.map(estudiante => ({
             nombre_estudiante: estudiante.nombre_estudiante,
-            encargado: doc(db, 'Usuarios', estudiante.encargado.id)  // Single guardian reference
+            encargado: doc(db, 'Usuarios', estudiante.encargado.id)
           })),
         });
         alert('Grupo registrado exitosamente');
@@ -113,8 +95,11 @@ const GroupForm = ({ onClose, selectedGroup }) => {
     setShowStudentForm(false);
     setSelectedStudent(null);
     if (estudianteAgregado) {
-      const encargadoData = await getEstudiantesWithEncargados([estudianteAgregado]);
-      const estudianteConEncargado = encargadoData[0];
+      const encargadoData = await getEncargadoData(doc(db, 'Usuarios', estudianteAgregado.encargado.id));
+      const estudianteConEncargado = {
+        ...estudianteAgregado,
+        encargado: encargadoData,
+      };
 
       if (selectedStudent) {
         const estudiantesActualizados = estudiantes.map((estudiante) =>
