@@ -1,4 +1,3 @@
-// src/components/sections/InstitutionSection.js
 import React, { useContext, useState } from 'react';
 import InstitutionForm from '../InstitutionForm';
 import { DataContext } from '../../context/DataContext';
@@ -6,14 +5,16 @@ import { db } from '../../firebase';
 import { doc, deleteDoc, getDocs, query, collection, where } from 'firebase/firestore';
 
 const InstitutionSection = () => {
-  const { institutions, fetchData } = useContext(DataContext);
+  const { institutions, fetchInstitutions, fetchTeachers, fetchStudentGuardians, fetchGroups } = useContext(DataContext);
   const [showInstitutionForm, setShowInstitutionForm] = useState(false);
   const [selectedInstitution, setSelectedInstitution] = useState(null);
 
-  const handleCloseInstitutionForm = () => {
+  const handleCloseInstitutionForm = (updated) => {
     setShowInstitutionForm(false);
     setSelectedInstitution(null);
-    fetchData();
+    if (updated) {
+      fetchInstitutions();
+    }
   };
 
   const handleEditInstitution = (institution) => {
@@ -35,10 +36,10 @@ const InstitutionSection = () => {
         const teachersToDelete = teachersSnapshot.docs.map((doc) => doc.ref);
   
         // Obtener los encargados relacionados con la institución
-        const guardianssSnapshot = await getDocs(
+        const guardiansSnapshot = await getDocs(
           query(collection(db, 'Usuarios'), where('institucion', '==', doc(db, 'Instituciones', institutionId)), where('rol', '==', 'encargado'))
         );
-        const guardiansToDelete = guardianssSnapshot.docs.map((doc) => doc.ref);
+        const guardiansToDelete = guardiansSnapshot.docs.map((doc) => doc.ref);
   
         // Obtener los grupos relacionados con la institución
         const groupsSnapshot = await getDocs(
@@ -58,7 +59,12 @@ const InstitutionSection = () => {
         await deleteDoc(doc(db, 'Instituciones', institutionId));
   
         alert('Institución y documentos relacionados eliminados exitosamente');
-        fetchData();
+
+        // Fetch all related data
+        fetchInstitutions();
+        fetchTeachers();
+        fetchStudentGuardians();
+        fetchGroups();
       } catch (error) {
         console.error('Error al eliminar la institución y los documentos relacionados:', error);
         alert('Ocurrió un error al eliminar la institución y los documentos relacionados');
@@ -81,6 +87,7 @@ const InstitutionSection = () => {
         <InstitutionForm
           onClose={handleCloseInstitutionForm}
           selectedInstitution={selectedInstitution}
+          fetchInstitutions={fetchInstitutions}
         />
       )}
       {institutions.length > 0 ? (

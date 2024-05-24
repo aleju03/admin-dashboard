@@ -1,4 +1,3 @@
-// src/components/sections/TeacherSection.js
 import React, { useContext, useState } from 'react';
 import TeacherForm from '../TeacherForm';
 import { DataContext } from '../../context/DataContext';
@@ -6,14 +5,16 @@ import { db } from '../../firebase';
 import { doc, deleteDoc } from 'firebase/firestore';
 
 const TeacherSection = () => {
-  const { teachers, fetchData } = useContext(DataContext);
+  const { teachers, fetchTeachers } = useContext(DataContext);
   const [showTeacherForm, setShowTeacherForm] = useState(false);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
 
-  const handleCloseTeacherForm = () => {
+  const handleCloseTeacherForm = (updated) => {
     setShowTeacherForm(false);
     setSelectedTeacher(null);
-    fetchData();
+    if (updated) {
+      fetchTeachers();
+    }
   };
 
   const handleEditTeacher = (teacher) => {
@@ -25,7 +26,7 @@ const TeacherSection = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este profesor?')) {
       await deleteDoc(doc(db, 'Usuarios', teacherId));
       alert('Profesor eliminado exitosamente');
-      fetchData();
+      fetchTeachers();
     }
   };
 
@@ -44,6 +45,7 @@ const TeacherSection = () => {
         <TeacherForm
           onClose={handleCloseTeacherForm}
           selectedTeacher={selectedTeacher}
+          fetchTeachers={fetchTeachers}
         />
       )}
       {teachers.length > 0 ? (

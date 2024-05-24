@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { db } from '../firebase';
-import { addDoc, collection, doc, updateDoc, query, getDocs, where } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc, getDocs, query, where } from 'firebase/firestore';
 import { DataContext } from '../context/DataContext';
 
-const TeacherForm = ({ onClose, selectedTeacher }) => {
+const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
   const { institutions } = useContext(DataContext);
   const [nombre, setNombre] = useState('');
   const [carne, setCarne] = useState('');
@@ -29,18 +29,8 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
   
     const institucionRef = doc(db, 'Instituciones', institucion);
   
-    // Verificar si ya existe un usuario con el mismo carné
-    const usuariosSnapshot = await getDocs(
-      query(collection(db, 'Usuarios'), where('carne', '==', carne))
-    );
-  
-    if (!usuariosSnapshot.empty) {
-      alert('Ya existe un usuario con el mismo carné. Por favor, ingresa un carné único.');
-      return;
-    }
-  
     if (selectedTeacher) {
-      // Edit existing teacher
+      // Editar profesor existente
       try {
         await updateDoc(doc(db, 'Usuarios', selectedTeacher.id), {
           nombre,
@@ -49,12 +39,23 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
           institucion: institucionRef,
         });
         alert('Profesor actualizado exitosamente');
-        onClose();
+        onClose(true); // Indica que se han realizado cambios
+        fetchTeachers();
       } catch (error) {
         alert('Error al actualizar el profesor: ' + error.message);
       }
     } else {
-      // Add new teacher
+      // Verificar si ya existe un usuario con el mismo carné
+      const usuariosSnapshot = await getDocs(
+        query(collection(db, 'Usuarios'), where('carne', '==', carne))
+      );
+
+      if (!usuariosSnapshot.empty) {
+        alert('Ya existe un usuario con el mismo carné. Por favor, ingresa un carné único.');
+        return;
+      }
+
+      // Agregar nuevo profesor
       try {
         await addDoc(collection(db, 'Usuarios'), {
           nombre,
@@ -64,7 +65,8 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
           institucion: institucionRef,
         });
         alert('Profesor registrado exitosamente');
-        onClose();
+        onClose(true); // Indica que se han realizado cambios
+        fetchTeachers();
       } catch (error) {
         alert('Error registrando profesor: ' + error.message);
       }
@@ -124,7 +126,7 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => onClose(false)} // Indica que no se han realizado cambios
             className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
           >
             Cerrar

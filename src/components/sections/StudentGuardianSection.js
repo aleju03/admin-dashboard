@@ -1,4 +1,3 @@
-// src/components/sections/StudentGuardianSection.js
 import React, { useContext, useState } from 'react';
 import StudentGuardianForm from '../StudentGuardianForm';
 import { DataContext } from '../../context/DataContext';
@@ -6,14 +5,16 @@ import { db } from '../../firebase';
 import { doc, deleteDoc } from 'firebase/firestore';
 
 const StudentGuardianSection = () => {
-  const { studentGuardians, fetchData } = useContext(DataContext);
+  const { studentGuardians, fetchStudentGuardians } = useContext(DataContext);
   const [showStudentGuardianForm, setShowStudentGuardianForm] = useState(false);
   const [selectedStudentGuardian, setSelectedStudentGuardian] = useState(null);
 
-  const handleCloseStudentGuardianForm = () => {
+  const handleCloseStudentGuardianForm = (updated) => {
     setShowStudentGuardianForm(false);
     setSelectedStudentGuardian(null);
-    fetchData();
+    if (updated) {
+      fetchStudentGuardians();
+    }
   };
 
   const handleEditStudentGuardian = (studentGuardian) => {
@@ -25,7 +26,7 @@ const StudentGuardianSection = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este encargado de estudiante?')) {
       await deleteDoc(doc(db, 'Usuarios', studentGuardianId));
       alert('Encargado de estudiante eliminado exitosamente');
-      fetchData();
+      fetchStudentGuardians();
     }
   };
 
@@ -44,6 +45,7 @@ const StudentGuardianSection = () => {
         <StudentGuardianForm
           onClose={handleCloseStudentGuardianForm}
           selectedStudentGuardian={selectedStudentGuardian}
+          fetchStudentGuardians={fetchStudentGuardians}
         />
       )}
       {studentGuardians.length > 0 ? (

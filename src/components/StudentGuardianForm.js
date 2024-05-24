@@ -3,7 +3,7 @@ import { db } from '../firebase';
 import { addDoc, collection, doc, updateDoc, getDocs, query, where } from 'firebase/firestore';
 import { DataContext } from '../context/DataContext';
 
-const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
+const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGuardians }) => {
   const { institutions } = useContext(DataContext);
   const [nombre, setNombre] = useState('');
   const [carne, setCarne] = useState('');
@@ -26,21 +26,11 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const institucionRef = doc(db, 'Instituciones', institucion);
-  
-    // Verificar si ya existe un usuario con el mismo carné
-    const usuariosSnapshot = await getDocs(
-      query(collection(db, 'Usuarios'), where('carne', '==', carne))
-    );
-  
-    if (!usuariosSnapshot.empty) {
-      alert('Ya existe un usuario con el mismo carné. Por favor, ingresa un carné único.');
-      return;
-    }
-  
+
     if (selectedStudentGuardian) {
-      // Edit existing student guardian
+      // Editar encargado existente
       try {
         await updateDoc(doc(db, 'Usuarios', selectedStudentGuardian.id), {
           nombre,
@@ -49,12 +39,23 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
           institucion: institucionRef,
         });
         alert('Encargado actualizado exitosamente');
-        onClose();
+        onClose(true); // Indica que se han realizado cambios
+        fetchStudentGuardians();
       } catch (error) {
         alert('Error al actualizar el encargado: ' + error.message);
       }
     } else {
-      // Add new student guardian
+      // Verificar si ya existe un usuario con el mismo carné
+      const usuariosSnapshot = await getDocs(
+        query(collection(db, 'Usuarios'), where('carne', '==', carne))
+      );
+
+      if (!usuariosSnapshot.empty) {
+        alert('Ya existe un usuario con el mismo carné. Por favor, ingresa un carné único.');
+        return;
+      }
+
+      // Agregar nuevo encargado
       try {
         await addDoc(collection(db, 'Usuarios'), {
           nombre,
@@ -64,7 +65,8 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
           institucion: institucionRef,
         });
         alert('Encargado registrado exitosamente');
-        onClose();
+        onClose(true); // Indica que se han realizado cambios
+        fetchStudentGuardians();
       } catch (error) {
         alert('Error registrando encargado: ' + error.message);
       }
@@ -124,7 +126,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian }) => {
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => onClose(false)} // Indica que no se han realizado cambios
             className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
           >
             Cerrar

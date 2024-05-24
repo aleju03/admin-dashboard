@@ -4,17 +4,13 @@ import { addDoc, collection, doc, query, where, updateDoc, getDocs, getDoc } fro
 import { DataContext } from '../context/DataContext';
 import StudentForm from './StudentForm';
 
-// Function to get data of the guardian
-const getEncargadoData = async (encargadoRef) => {
-  const encargadoDoc = await getDoc(encargadoRef);
-  if (encargadoDoc.exists()) {
-    return { id: encargadoDoc.id, ...encargadoDoc.data() };
-  }
-  return null;
+const getEncargadoData = async (encargadoRefs) => {
+  const encargadoDocs = await Promise.all(encargadoRefs.map(ref => getDoc(ref)));
+  return encargadoDocs.map(doc => doc.exists() ? { id: doc.id, ...doc.data() } : null);
 };
 
-const GroupForm = ({ onClose, selectedGroup }) => {
-  const { institutions, teachers, fetchData } = useContext(DataContext);
+const GroupForm = ({ onClose, selectedGroup, fetchGroups }) => {
+  const { institutions, teachers } = useContext(DataContext);
   const [nombre, setNombre] = useState('');
   const [institucion, setInstitucion] = useState('');
   const [docente, setDocente] = useState('');
@@ -46,8 +42,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
       const institucionQuery = query(collection(db, 'Instituciones'), where('nombre', '==', institucion));
       const docenteQuery = query(collection(db, 'Usuarios'), where('nombre', '==', docente));
 
-      const institucionDoc = await getDocs(institucionQuery);
-      const docenteDoc = await getDocs(docenteQuery);
+      const [institucionDoc, docenteDoc] = await Promise.all([getDocs(institucionQuery), getDocs(docenteQuery)]);
 
       if (institucionDoc.empty || docenteDoc.empty) {
         alert('La institución o el docente seleccionado no existe');
@@ -84,8 +79,8 @@ const GroupForm = ({ onClose, selectedGroup }) => {
       setInstitucion('');
       setDocente('');
       setEstudiantes([]);
-      onClose();
-      fetchData();
+      onClose(true); // Indica que se han realizado cambios
+      fetchGroups();
     } catch (error) {
       alert('Error al guardar el grupo: ' + error.message);
     }
@@ -95,10 +90,10 @@ const GroupForm = ({ onClose, selectedGroup }) => {
     setShowStudentForm(false);
     setSelectedStudent(null);
     if (estudianteAgregado) {
-      const encargadoData = await getEncargadoData(doc(db, 'Usuarios', estudianteAgregado.encargado.id));
+      const encargadoData = await getEncargadoData([doc(db, 'Usuarios', estudianteAgregado.encargado.id)]);
       const estudianteConEncargado = {
         ...estudianteAgregado,
-        encargado: encargadoData,
+        encargado: encargadoData[0],
       };
 
       if (selectedStudent) {
@@ -177,7 +172,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => onClose(false)} // Indica que no se han realizado cambios
             className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
           >
             Cerrar

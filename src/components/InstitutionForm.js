@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
 
-const InstitutionForm = ({ onClose, selectedInstitution }) => {
+const InstitutionForm = ({ onClose, selectedInstitution, fetchInstitutions }) => {
   const [nombre, setNombre] = useState('');
   const [direccion, setDireccion] = useState('');
   const [telefono, setTelefono] = useState('');
@@ -39,7 +39,8 @@ const InstitutionForm = ({ onClose, selectedInstitution }) => {
           telefono,
         });
         alert('Institución actualizada exitosamente');
-        onClose();
+        onClose(true); // Indica que se han realizado cambios
+        fetchInstitutions();
       } catch (error) {
         alert('Error al actualizar la institución: ' + error.message);
       }
@@ -52,7 +53,8 @@ const InstitutionForm = ({ onClose, selectedInstitution }) => {
           telefono,
         });
         alert('Institución registrada exitosamente');
-        onClose();
+        onClose(true); // Indica que se han realizado cambios
+        fetchInstitutions();
       } catch (error) {
         alert('Error al registrar la institución: ' + error.message);
       }
@@ -99,7 +101,7 @@ const InstitutionForm = ({ onClose, selectedInstitution }) => {
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => onClose(false)} // Indica que no se han realizado cambios
             className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded"
           >
             Cerrar

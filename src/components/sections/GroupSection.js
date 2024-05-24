@@ -5,14 +5,16 @@ import { db } from '../../firebase';
 import { doc, deleteDoc } from 'firebase/firestore';
 
 const GroupSection = () => {
-  const { groups, fetchData } = useContext(DataContext);
+  const { groups, fetchGroups } = useContext(DataContext);
   const [showGroupForm, setShowGroupForm] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState(null);
 
-  const handleCloseGroupForm = () => {
+  const handleCloseGroupForm = (updated) => {
     setShowGroupForm(false);
     setSelectedGroup(null);
-    fetchData();
+    if (updated) {
+      fetchGroups();
+    }
   };
 
   const handleEditGroup = (group) => {
@@ -24,7 +26,7 @@ const GroupSection = () => {
     if (window.confirm('¿Estás seguro de que deseas eliminar este grupo?')) {
       await deleteDoc(doc(db, 'Grupos', groupId));
       alert('Grupo eliminado exitosamente');
-      fetchData();
+      fetchGroups();
     }
   };
 
@@ -40,7 +42,7 @@ const GroupSection = () => {
         </button>
       </div>
       {showGroupForm && (
-        <GroupForm onClose={handleCloseGroupForm} selectedGroup={selectedGroup} />
+        <GroupForm onClose={handleCloseGroupForm} selectedGroup={selectedGroup} fetchGroups={fetchGroups} />
       )}
       {groups.length > 0 ? (
         <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
