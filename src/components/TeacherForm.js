@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { db } from '../firebase';
-import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc, query, getDocs, where } from 'firebase/firestore';
 import { DataContext } from '../context/DataContext';
 
 const TeacherForm = ({ onClose, selectedTeacher }) => {
@@ -26,9 +26,19 @@ const TeacherForm = ({ onClose, selectedTeacher }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const institucionRef = doc(db, 'Instituciones', institucion);
-
+  
+    // Verificar si ya existe un usuario con el mismo carné
+    const usuariosSnapshot = await getDocs(
+      query(collection(db, 'Usuarios'), where('carne', '==', carne))
+    );
+  
+    if (!usuariosSnapshot.empty) {
+      alert('Ya existe un usuario con el mismo carné. Por favor, ingresa un carné único.');
+      return;
+    }
+  
     if (selectedTeacher) {
       // Edit existing teacher
       try {

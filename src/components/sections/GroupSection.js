@@ -81,7 +81,7 @@ const GroupSection = () => {
           </tbody>
         </table>
       ) : (
-        <p>No hay grupos registrados.</p>
+        <p className="no-data-message">No hay grupos registrados.</p>
       )}
     </div>
   );

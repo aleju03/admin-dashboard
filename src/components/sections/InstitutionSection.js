@@ -120,7 +120,7 @@ const InstitutionSection = () => {
           </tbody>
         </table>
       ) : (
-        <p>No hay instituciones registradas.</p>
+        <p className="no-data-message">No hay instituciones registradas.</p>
       )}
     </div>
   );

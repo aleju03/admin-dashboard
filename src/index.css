@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+}
+
+.no-data-message {
+  @apply text-center text-gray-500 text-xl font-bold select-none;
+  
+  /* Flexbox centering */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(80vh - 4rem); /* Adjust for header or other fixed elements if necessary */
+  width: 100%;
+}

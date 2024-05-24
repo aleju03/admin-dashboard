@@ -81,7 +81,7 @@ const TeacherSection = () => {
           </tbody>
         </table>
       ) : (
-        <p>No hay profesores registrados.</p>
+        <p className="no-data-message">No hay profesores registrados.</p>
       )}
     </div>
   );

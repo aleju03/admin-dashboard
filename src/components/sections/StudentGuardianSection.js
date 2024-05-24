@@ -81,7 +81,7 @@ const StudentGuardianSection = () => {
           </tbody>
         </table>
       ) : (
-        <p>No hay encargados de estudiantes registrados.</p>
+        <p className="no-data-message">No hay encargados de estudiantes registrados.</p>
       )}
     </div>
   );

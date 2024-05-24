@@ -3,14 +3,14 @@ import React from 'react';
 
 const Sidebar = ({ onSectionClick }) => {
   return (
-    <div className="bg-blue-900 text-white w-1/5 p-6 flex flex-col">
+    <div className="bg-blue-900 text-white w-1/5 p-6 flex flex-col sticky top-0 overflow-y-auto">
       <h1
         className="text-2xl font-bold mb-8 cursor-pointer"
         onClick={() => onSectionClick('dashboard')}
       >
         Panel de Administración
       </h1>
-      <nav className="flex-1">
+      <nav>
         <ul>
           <li className="mb-4">
             <button
