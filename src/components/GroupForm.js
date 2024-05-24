@@ -19,7 +19,7 @@ const getEstudiantesWithEncargados = async (estudiantes) => {
     const encargadoData = await getEncargadoData(estudiante.encargado);
     return {
       ...estudiante,
-      encargado: encargadoData,
+      encargado: encargadoData,  // Single guardian object
     };
   }));
   return estudiantesWithEncargados;
@@ -82,7 +82,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           docente: docenteRef,
           estudiantes: estudiantes.map(estudiante => ({
             nombre_estudiante: estudiante.nombre_estudiante,
-            encargado: doc(db, 'Usuarios', estudiante.encargado.id)
+            encargado: doc(db, 'Usuarios', estudiante.encargado.id)  // Single guardian reference
           })),
         });
         alert('Grupo actualizado exitosamente');
@@ -93,7 +93,7 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           docente: docenteRef,
           estudiantes: estudiantes.map(estudiante => ({
             nombre_estudiante: estudiante.nombre_estudiante,
-            encargado: doc(db, 'Usuarios', estudiante.encargado.id)
+            encargado: doc(db, 'Usuarios', estudiante.encargado.id)  // Single guardian reference
           })),
         });
         alert('Grupo registrado exitosamente');
@@ -138,12 +138,10 @@ const GroupForm = ({ onClose, selectedGroup }) => {
   };
 
   const handleDeleteStudent = (student) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar este estudiante?')) {
-      const estudiantesActualizados = estudiantes.filter(
-        (estudiante) => estudiante.nombre_estudiante !== student.nombre_estudiante
-      );
-      setEstudiantes(estudiantesActualizados);
-    }
+    const estudiantesActualizados = estudiantes.filter(
+      (estudiante) => estudiante.nombre_estudiante !== student.nombre_estudiante
+    );
+    setEstudiantes(estudiantesActualizados);
   };
 
   return (
