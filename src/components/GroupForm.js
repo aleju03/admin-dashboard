@@ -4,7 +4,6 @@ import { addDoc, collection, doc, query, where, updateDoc, getDocs, getDoc } fro
 import { DataContext } from '../context/DataContext';
 import StudentForm from './StudentForm';
 
-// Function to get data of the responsible
 const getEncargadoData = async (encargadoRef) => {
   const encargadoDoc = await getDoc(encargadoRef);
   if (encargadoDoc.exists()) {
@@ -13,7 +12,6 @@ const getEncargadoData = async (encargadoRef) => {
   return null;
 };
 
-// Function to get students with data of responsible
 const getEstudiantesWithEncargados = async (estudiantes) => {
   const estudiantesWithEncargados = await Promise.all(estudiantes.map(async (estudiante) => {
     const encargadosData = await Promise.all(estudiante.encargados.map(getEncargadoData));
@@ -104,28 +102,27 @@ const GroupForm = ({ onClose, selectedGroup }) => {
   };
 
   const handleCloseStudentForm = async (estudianteAgregado) => {
-    setShowStudentForm(false);
-    setSelectedStudent(null);
-    if (estudianteAgregado) {
-      if (selectedStudent) {
-        const estudiantesActualizados = estudiantes.map((estudiante) =>
-          estudiante.nombre_estudiante === selectedStudent.nombre_estudiante ? estudianteAgregado : estudiante
-        );
-        setEstudiantes(estudiantesActualizados);
-      } else {
-        const encargadosData = await Promise.all(
-          estudianteAgregado.encargados.map(async (encargadoRef) => {
-            const encargadoDoc = await getDoc(encargadoRef);
-            return encargadoDoc.data();
-          })
-        );
-        const estudianteConEncargados = {
-          ...estudianteAgregado,
-          encargados: encargadosData,
-        };
-        setEstudiantes([...estudiantes, estudianteConEncargados]);
+      setShowStudentForm(false);
+      setSelectedStudent(null);
+      if (estudianteAgregado) {
+          const encargadosData = await Promise.all(
+              estudianteAgregado.encargados.map(getEncargadoData)
+          );
+
+          const estudianteConEncargados = {
+              ...estudianteAgregado,
+              encargados: encargadosData.filter(e => e !== null),
+          };
+
+          if (selectedStudent) {
+              const estudiantesActualizados = estudiantes.map((estudiante) =>
+                  estudiante.nombre_estudiante === selectedStudent.nombre_estudiante ? estudianteConEncargados : estudiante
+              );
+              setEstudiantes(estudiantesActualizados);
+          } else {
+              setEstudiantes([...estudiantes, estudianteConEncargados]);
+          }
       }
-    }
   };
 
   const handleAddStudent = () => {
