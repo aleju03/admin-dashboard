@@ -212,27 +212,19 @@ const GroupForm = ({ onClose, selectedGroup }) => {
           </button>
           {estudiantes.length > 0 ? (
             <div className="max-h-[40vh] overflow-y-auto">
-              <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+              <table className="min-w-full bg-gray-200 shadow-md rounded-lg overflow-hidden">
                 <thead className="bg-gray-800 text-white">
                   <tr>
-                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                      Nombre
-                    </th>
-                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                      Encargados
-                    </th>
-                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">
-                      Acciones
-                    </th>
+                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Nombre</th>
+                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Encargados</th>
+                    <th className="py-3 px-4 uppercase font-semibold text-sm text-left">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="text-gray-700">
                   {estudiantes.map((estudiante, index) => (
                     <tr key={index}>
                       <td className="py-3 px-4">{estudiante.nombre_estudiante}</td>
-                      <td className="py-3 px-4">
-                        {estudiante.encargados.map((encargado) => encargado.nombre).join(', ')}
-                      </td>
+                      <td className="py-3 px-4">{estudiante.encargados.map((encargado) => encargado.nombre).join(', ')}</td>
                       <td className="py-3 px-4">
                         <button
                           className="bg-orange-500 hover:bg-orange-600 text-white py-1 px-2 rounded mr-2"
