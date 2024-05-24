@@ -8,7 +8,7 @@ import DashboardStats from './sections/DashboardStats';
 
 const MainContent = ({ activeSection, onSectionChange }) => {
   return (
-    <div className="flex-1 overflow-y-auto p-8">
+    <div className="flex-1 overflow-y-auto p-8 h-full">
       {activeSection === 'dashboard' && <DashboardStats onSectionChange={onSectionChange} />}
       {activeSection === 'institutions' && <InstitutionSection />}
       {activeSection === 'teachers' && <TeacherSection />}

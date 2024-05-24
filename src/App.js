@@ -13,7 +13,9 @@ const App = () => {
   return (
     <div className="flex h-screen">
       <Sidebar onSectionClick={handleSectionClick} />
-      <MainContent activeSection={activeSection} onSectionChange={handleSectionClick} />
+      <div className="flex-1 ml-64">
+        <MainContent activeSection={activeSection} onSectionChange={handleSectionClick} />
+      </div>
     </div>
   );
 };
