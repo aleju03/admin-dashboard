@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { db } from '../firebase';
-import { addDoc, collection, doc, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, doc, updateDoc, query, where, getDocs } from 'firebase/firestore';
 import { DataContext } from '../context/DataContext';
 import { SparklesIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 
@@ -28,6 +28,15 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
     e.preventDefault();
 
     const institucionRef = doc(db, 'Instituciones', institucion);
+
+    // Check if carne already exists
+    const carneQuery = query(collection(db, 'Usuarios'), where('carne', '==', carne));
+    const carneSnapshot = await getDocs(carneQuery);
+
+    if (!carneSnapshot.empty && (!selectedStudentGuardian || carneSnapshot.docs[0].id !== selectedStudentGuardian.id)) {
+      alert('El carné ya está en uso por otro usuario.');
+      return;
+    }
 
     if (selectedStudentGuardian) {
       // Editar encargado existente
