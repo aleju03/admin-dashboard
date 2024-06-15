@@ -15,7 +15,7 @@ const Sidebar = ({ onSectionClick }) => {
         className="text-3xl font-bold mb-10 cursor-pointer hover:text-blue-300 transition duration-300"
         onClick={() => onSectionClick('dashboard')}
       >
-        Panel de Administración
+        Dashboard
       </h1>
       <nav>
         <ul className="space-y-2">

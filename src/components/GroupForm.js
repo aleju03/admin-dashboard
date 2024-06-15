@@ -13,16 +13,30 @@ const GroupForm = ({ onClose, selectedGroup, fetchGroups }) => {
   useEffect(() => {
     if (selectedGroup) {
       setNombre(selectedGroup.nombre);
-      setInstitucion(selectedGroup.institucion.id);
-      setDocente(selectedGroup.docente.id);
       setEncargados(selectedGroup.encargados.map((encargado) => encargado.id));
+  
+      // Find the corresponding institution object based on the name
+      const selectedInstitution = institutions.find(
+        (inst) => inst.nombre === selectedGroup.institucion
+      );
+      if (selectedInstitution) {
+        setInstitucion(selectedInstitution.id);
+      }
+  
+      // Find the corresponding teacher object based on the name
+      const selectedTeacher = teachers.find(
+        (teacher) => teacher.nombre === selectedGroup.docente
+      );
+      if (selectedTeacher) {
+        setDocente(selectedTeacher.id);
+      }
     } else {
       setNombre('');
       setInstitucion('');
       setDocente('');
       setEncargados([]);
     }
-  }, [selectedGroup]);
+  }, [selectedGroup, institutions, teachers]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

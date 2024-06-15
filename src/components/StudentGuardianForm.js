@@ -8,7 +8,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
   const { institutions } = useContext(DataContext);
   const [nombre, setNombre] = useState('');
   const [carne, setCarne] = useState('');
-  const [contraseña, setContraseña] = useState('');
+  const [contrasena, setContrasena] = useState('');
   const [institucion, setInstitucion] = useState('');
   const [estudiantes, setEstudiantes] = useState([]);
   const [nombreEstudiante, setNombreEstudiante] = useState('');
@@ -18,7 +18,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
     if (selectedStudentGuardian) {
       setNombre(selectedStudentGuardian.nombre);
       setCarne(selectedStudentGuardian.carne);
-      setContraseña(selectedStudentGuardian.contraseña);
+      setContrasena(selectedStudentGuardian.contrasena);
       setInstitucion(selectedStudentGuardian.institucion.id);
       setEstudiantes(selectedStudentGuardian.estudiantes || []);
     }
@@ -44,7 +44,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
         await updateDoc(doc(db, 'Usuarios', selectedStudentGuardian.id), {
           nombre,
           carne,
-          contraseña,
+          contrasena,
           institucion: institucionRef,
           estudiantes,
         });
@@ -60,7 +60,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
         await addDoc(collection(db, 'Usuarios'), {
           nombre,
           carne,
-          contraseña,
+          contrasena,
           rol: 'encargado',
           institucion: institucionRef,
           estudiantes,
@@ -94,15 +94,15 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
     setCarne(generatedCarne);
   };
 
-  const generateContraseña = () => {
+  const generateContrasena = () => {
     const nameParts = nombre.trim().split(' ');
     const firstPart = nameParts[0].toLowerCase();
     const secondInitial = nameParts[1] ? nameParts[1][0].toLowerCase() : '';
     const randomDigits = Math.floor(Math.random() * 900) + 100; // generates a random 3 digit number
     const randomLetter = String.fromCharCode(97 + Math.floor(Math.random() * 26)); // generates a random letter
 
-    const generatedContraseña = `${firstPart}${secondInitial}${randomDigits}${randomLetter}`;
-    setContraseña(generatedContraseña);
+    const generatedContrasena = `${firstPart}${secondInitial}${randomDigits}${randomLetter}`;
+    setContrasena(generatedContrasena);
   };
 
   const togglePasswordVisibility = () => {
@@ -144,8 +144,8 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
           <div className="relative">
             <input
               type={passwordVisible ? "text" : "password"}
-              value={contraseña}
-              onChange={(e) => setContraseña(e.target.value)}
+              value={contrasena}
+              onChange={(e) => setContrasena(e.target.value)}
               placeholder="Contraseña del Encargado"
               className="border p-2 mb-2 w-full pr-10"
               required
@@ -154,7 +154,7 @@ const StudentGuardianForm = ({ onClose, selectedStudentGuardian, fetchStudentGua
               <button
                 type="button"
                 className="absolute right-2 top-[calc(50%-4px)] transform -translate-y-1/2 text-blue-500"
-                onClick={generateContraseña}
+                onClick={generateContrasena}
               >
                 <SparklesIcon className="h-6 w-6" />
               </button>

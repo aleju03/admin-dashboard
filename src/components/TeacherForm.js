@@ -8,7 +8,7 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
   const { institutions } = useContext(DataContext);
   const [nombre, setNombre] = useState('');
   const [carne, setCarne] = useState('');
-  const [contraseña, setContraseña] = useState('');
+  const [contrasena, setContrasena] = useState('');
   const [institucion, setInstitucion] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
 
@@ -16,7 +16,7 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
     if (selectedTeacher) {
       setNombre(selectedTeacher.nombre);
       setCarne(selectedTeacher.carne);
-      setContraseña(selectedTeacher.contraseña);
+      setContrasena(selectedTeacher.contrasena);
       setInstitucion(selectedTeacher.institucion.id);
     }
   }, [selectedTeacher]);
@@ -32,7 +32,7 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
         await updateDoc(doc(db, 'Usuarios', selectedTeacher.id), {
           nombre,
           carne,
-          contraseña,
+          contrasena,
           institucion: institucionRef,
         });
         alert('Profesor actualizado exitosamente');
@@ -57,7 +57,7 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
         await addDoc(collection(db, 'Usuarios'), {
           nombre,
           carne,
-          contraseña,
+          contrasena,
           rol: 'docente',
           institucion: institucionRef,
         });
@@ -77,15 +77,15 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
     setCarne(generatedCarne);
   };
 
-  const generateContraseña = () => {
+  const generateContrasena = () => {
     const nameParts = nombre.trim().split(' ');
     const firstPart = nameParts[0].toLowerCase();
     const secondInitial = nameParts[1] ? nameParts[1][0].toLowerCase() : '';
     const randomDigits = Math.floor(Math.random() * 900) + 100; // generates a random 3 digit number
     const randomLetter = String.fromCharCode(97 + Math.floor(Math.random() * 26)); // generates a random letter
 
-    const generatedContraseña = `${firstPart}${secondInitial}${randomDigits}${randomLetter}`;
-    setContraseña(generatedContraseña);
+    const generatedContrasena = `${firstPart}${secondInitial}${randomDigits}${randomLetter}`;
+    setContrasena(generatedContrasena);
   };
 
   const togglePasswordVisibility = () => {
@@ -127,8 +127,8 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
           <div className="relative">
             <input
               type={passwordVisible ? "text" : "password"}
-              value={contraseña}
-              onChange={(e) => setContraseña(e.target.value)}
+              value={contrasena}
+              onChange={(e) => setContrasena(e.target.value)}
               placeholder="Contraseña del Profesor"
               className="border p-2 mb-2 w-full pr-10"
               required
@@ -137,7 +137,7 @@ const TeacherForm = ({ onClose, selectedTeacher, fetchTeachers }) => {
               <button
                 type="button"
                 className="absolute right-2 top-[calc(50%-4px)] transform -translate-y-1/2 text-blue-500"
-                onClick={generateContraseña}
+                onClick={generateContrasena}
               >
                 <SparklesIcon className="h-6 w-6" />
               </button>
